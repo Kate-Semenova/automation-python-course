@@ -28,16 +28,46 @@ output lines:
 foo@example.com 729.83 EUR accountName 2021-01:0 validate_date
 bar@example.com 729.83 accountName 2021-01-02 validate_line
 """
+from functools import reduce
 from typing import Callable, Iterable
+import re
 
 
 def validate_line(line: str) -> bool:
-    pass
+    # should check if a line has 5 elements
+    splited = line.strip().split(' ')
+    return len(splited) == 5
 
 
 def validate_date(date: str) -> bool:
-    pass
+    splited = date.strip().split(' ').pop()
+    splited_date = splited.split('-')
+    # yes, i could look it up but decided to try and create a wheel
+    if len(splited_date) != 3:
+        return False
+    q = splited_date[0]
+    w = splited_date[1]
+    e = splited_date[2]
+    return len(q) == 4 and q.isdigit() and len(w) == 2 and w.isdigit() and len(e) == 2 and e.isdigit()
+
+
+def validate_email(line: str) -> bool:
+    email = line.strip().split(' ')[0]
+    EMAIL_REGEX = re.compile(r"[^@]+@[^@]+\.[^@]+")
+    return EMAIL_REGEX.match(email)
 
 
 def check_data(filepath: str, validators: Iterable[Callable]) -> str:
-    pass
+
+    with open("./data.txt", "r") as inp, open(filepath, 'a+') as out:
+        for line in inp:
+            out.write(line.strip())
+            out.write(' ')
+            for validator in validators:
+                if not validator.__call__(line):
+                    out.write('FAILED with ' + validator.__name__ + ' ')
+            out.write('\n')
+        return out.name
+
+
+print(check_data("./result.txt", [validate_date, validate_line, validate_email]))
