@@ -27,5 +27,24 @@ assert = custom_range(string.ascii_lowercase, 'p', 'g', -2) == ['p', 'n', 'l', '
 from typing import List
 
 
-def custom_range(inp: List):
-    pass
+def custom_range(inp: List, *args):
+    len1 = len(args)
+    step = args[2] if len1 > 2 else 1
+    stop = args[0] if len1 > 0 else None
+    start, stop = (args[0], args[1]) if len1 > 1 else (inp[0], stop)
+
+    if step < 0:
+        inp = reversed(inp)
+        step = abs(step)
+
+    new_list = []
+    write = False
+    for i in inp:
+        if i == start:
+            write = True
+        if i == stop:
+            return new_list[::step]
+        if write:
+            new_list.append(i)
+
+    return new_list[::step]
