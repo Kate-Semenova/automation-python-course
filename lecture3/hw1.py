@@ -28,8 +28,9 @@ output lines:
 foo@example.com 729.83 EUR accountName 2021-01:0 validate_date
 bar@example.com 729.83 accountName 2021-01-02 validate_line
 """
+import os
 from functools import reduce
-from typing import Callable, Iterable
+from typing import Callable, Iterable, Match
 import re
 
 
@@ -39,6 +40,7 @@ def validate_line(line: str) -> bool:
     return len(splited) == 5
 
 
+# I know I could make it simple, but wanted to reinvent the wheel to get to know python better
 def validate_date(date: str) -> bool:
     splited = date.strip().split(' ').pop()
     splited_date = splited.split('-')
@@ -58,16 +60,13 @@ def validate_email(line: str) -> bool:
 
 
 def check_data(filepath: str, validators: Iterable[Callable]) -> str:
-
-    with open("./data.txt", "r") as inp, open(filepath, 'a+') as out:
+    with open(filepath, "r", encoding='utf-8') as inp, open("result.txt", 'w+', encoding='utf-8') as out:
         for line in inp:
-            out.write(line.strip())
-            out.write(' ')
             for validator in validators:
                 if not validator.__call__(line):
-                    out.write('FAILED with ' + validator.__name__ + ' ')
-            out.write('\n')
+                    out.write(line.strip())
+                    out.write(' ')
+                    out.write('FAILED_with_' + validator.__name__)
+                    out.write('\n')
+                    break  # only first one to be written in the report
         return out.name
-
-
-print(check_data("./result.txt", [validate_date, validate_line, validate_email]))

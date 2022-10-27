@@ -20,7 +20,9 @@ data = [
 
 @pytest.fixture
 def file_path():
-    tp = NamedTemporaryFile(mode="a")
+    if os.path.exists("temp.txt"):
+        os.remove(os.path.abspath("temp.txt"))
+    tp = open("temp.txt", mode="a", encoding='utf-8')
     for line in data:
         tp.write(line + "\n")
         tp.flush()
