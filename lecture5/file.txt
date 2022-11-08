@@ -1,0 +1,8 @@
+name = kek
+last_name = top
+song_name=shadilay
+power = 9001
+power2=879
+power3=879,99
+power4=879
+qwerty=0332e
