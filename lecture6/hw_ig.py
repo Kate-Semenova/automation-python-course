@@ -4,15 +4,12 @@
 # don't use third-party libraries
 
 def merge_elems(*elems):
-    def gen():
-        for _ in elems:
-            if not hasattr(_, '__iter__') or (type(_) is str and len(_) == 1):
-                yield _
-            else:
-                for e1 in _:
-                    yield from merge_elems(e1)
-
-    return gen()
+    for _ in elems:
+        if not hasattr(_, '__iter__') or (type(_) is str and len(_) == 1):
+            yield _
+        else:
+            for e1 in _:
+                yield from merge_elems(e1)
 
 
 for i in merge_elems([[[[[[[1, "sdfghjk", [2, 1.2, [3, 4]]]]]]]]], 5, "dfwe", 'd', [1, 2, 3], {"a": 1, "b": 2}, 4,
@@ -33,13 +30,11 @@ for _ in merge_elems(a, b, c, d):
 # extra functionality: if arg function can't be applied, return element as is + text exception
 
 def map_like(fun, *elems):
-    def gen():
-        for _ in elems:
-            try:
-                yield fun(_)
-            except Exception as e:
-                yield f"{_}: {e}"
-    return gen()
+    for _ in elems:
+        try:
+            yield fun(_)
+        except Exception as e:
+            yield f"{_}: {e}"
 
 
 a = [1, 2, 3]
