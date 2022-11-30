@@ -16,7 +16,7 @@ Check file with tests to see how all these classes are used. You can create any 
 you want.
 """
 from typing import Dict
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 
 class Hoooman:
@@ -30,12 +30,13 @@ class Homework:
     def __init__(self, text, deadline: timedelta):
         self.text = text
         self.deadline = deadline
+        self.creation_date = datetime.now()
 
     def is_deadline_has_passed(self):
-        return self.deadline == 0
+        return self.creation_date + timedelta(days=self.deadline) < datetime.now()
 
 
-class Result():
+class Result:
     def __init__(self, hw, solution, author):
         self.hw = hw
         self.solution = solution
@@ -48,29 +49,32 @@ class Teacher(Hoooman):
     @staticmethod
     def create_homework(name, deadline):
         homework = Homework(name, deadline)
-        Teacher.homework_done[homework] = set()
         return homework
 
-    @staticmethod
-    def check_homework(result: Result):
+    @classmethod
+    def check_homework(cls, result: Result):
+        if result.hw in cls.homework_done:
+            if result in cls.homework_done[result.hw]:
+                return True
+        else:
+            cls.homework_done[result.hw] = set()
         if len(result.solution) > 5:
-            Teacher.homework_done[result.hw] = set()
-            Teacher.homework_done[result.hw].add(result)
+            cls.homework_done[result.hw].add(result)
             return True
         else:
             return False
 
-    @staticmethod
-    def reset_results(hw=None):
+    @classmethod
+    def reset_results(cls, hw=None):
         if hw is None:
-            Teacher.homework_done.clear()
+            cls.homework_done.clear()
         else:
-            Teacher.homework_done.setdefault(hw, None)
+            cls.homework_done.setdefault(hw, None)
 
 
 class Student(Hoooman):
     def do_homework(self, hw: Homework, solution):
-        if hw.deadline < 0:
+        if hw.is_deadline_has_passed():
             raise DeadlineError("You are late")
         return Result(hw, solution, self)
 
