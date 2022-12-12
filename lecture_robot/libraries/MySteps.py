@@ -1,12 +1,14 @@
 import re
 import time
 from selenium import webdriver
+from selenium.common import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
 
-from Pages import HomePage, ProductPage, CartPage
-from my_expected_conditions import wait_for_number_of_elements_more_than_0, wait_for_number_of_elements_is_0
+from lecture_robot.libraries.Pages import HomePage, ProductPage, CartPage
+from lecture_robot.libraries.my_expected_conditions import wait_for_number_of_elements_more_than_0, \
+    wait_for_number_of_elements_is_0
 
 
 class MySteps:
@@ -109,6 +111,21 @@ class MySteps:
 
     def clean_cart(self):
         self.click_on_cart_button()
-        self.wait.until(wait_for_number_of_elements_more_than_0(self.cartpage.get_products))
-        self.cartpage.get_products()[0].delete.click()
-        self.wait.until(wait_for_number_of_elements_is_0(self.cartpage.get_products))
+        try:
+            self.wait.until(wait_for_number_of_elements_more_than_0(self.cartpage.get_products))
+            self.cartpage.get_products()[0].delete.click()
+            self.wait.until(wait_for_number_of_elements_is_0(self.cartpage.get_products))
+        except TimeoutException:
+            pass
+
+    def login_and_password_fields_are_presented(self):
+        return self.homepage.password_input.is_displayed() and self.homepage.username_input.is_displayed()
+
+    def log_in_with(self, username, password):
+        self.click_login_button()
+        self.set_up_login_and_password(username, password)
+        self.click_form_login_button()
+        self.log_out_button_is_presented()
+
+    def log_out(self):
+        self.homepage.logout_button.click()
