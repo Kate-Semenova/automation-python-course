@@ -1,7 +1,7 @@
 from selenium.webdriver.common.by import By
 from seleniumpagefactory import PageFactory
 
-from Components import ProductInCartComponent, ProductComponent
+from lecture_robot.libraries.Components import ProductInCartComponent, ProductComponent
 
 
 class BasePage(PageFactory):
